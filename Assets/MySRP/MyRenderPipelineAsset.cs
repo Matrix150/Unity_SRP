@@ -6,8 +6,10 @@ using UnityEngine.Rendering;
 
 public class MyRenderPipelineAsset : RenderPipelineAsset
 {
+    [SerializeField] bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true; // Batch settings
+
     protected override RenderPipeline CreatePipeline()
     {
-        return new MyRenderPipeline();
+        return new MyRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher);
     }
 }

@@ -10,7 +10,7 @@ public partial class CameraRender
     CullingResults cullingResults;
     static ShaderTagId unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
 
-    public void Render(ScriptableRenderContext context, Camera camera)
+    public void Render(ScriptableRenderContext context, Camera camera, bool useDynamicBatching, bool useGPUInstancing)
     {
         this.context = context;
         this.camera = camera;
@@ -21,7 +21,7 @@ public partial class CameraRender
             return;
 
         Setup();
-        DrawVisibleGeometry();
+        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);  // Pass batch setting
         DrawGizmos();
         DrawUnsupportedShaders();
         Submit();
@@ -36,11 +36,11 @@ public partial class CameraRender
         ExecuteBuffer();
     }
 
-    void DrawVisibleGeometry()
+    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing)
     {
         // Opaque
         var sortSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
-        var drawingSettings = new DrawingSettings(unlitShaderTagId, sortSettings);
+        var drawingSettings = new DrawingSettings(unlitShaderTagId, sortSettings) { enableDynamicBatching = useDynamicBatching, enableInstancing = useGPUInstancing };
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
 

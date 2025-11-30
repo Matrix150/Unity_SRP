@@ -1,9 +1,10 @@
+// A partial class only use in Unity Editor
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 
-partial class CameraRender
+public partial class CameraRender
 {
     partial void DrawGizmos();
     partial void DrawUnsupportedShaders();
