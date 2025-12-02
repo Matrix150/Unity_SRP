@@ -30,9 +30,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _CLIPPING: 0
+    - _Clipping: 0
     - _Cutoff: 0.5
     - _DstBlend: 0
     - _Metallic: 0
+    - _PremulAlpha: 0
     - _Smoothness: 0.5
     - _SrcBlend: 1
     - _ZWrite: 1
