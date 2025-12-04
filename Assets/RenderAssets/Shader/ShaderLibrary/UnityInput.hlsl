@@ -10,6 +10,7 @@ CBUFFER_START(UnityPerDraw)
 
 	// For light maps
 	float4 unity_LightmapST;
+	float4 unity_ProbesOcclusion;
 	float4 unity_DynamicLightmapST;
 	float4 unity_SHAr;
 	float4 unity_SHAg;

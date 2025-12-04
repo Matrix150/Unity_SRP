@@ -771,7 +771,7 @@ MonoBehaviour:
   cutoff: 0.5
   metallic: 0
   smoothness: 0.5
-  emissionColor: {r: 32, g: 0, b: 31.678528, a: 1}
+  emissionColor: {r: 8, g: 8, b: 8, a: 1}
 --- !u!1 &633884635
 GameObject:
   m_ObjectHideFlags: 0
@@ -951,7 +951,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 1.02e-43, y: 4.9e-44, z: 6.784e-42, w: 0}
+  m_BoundingSphereOverride: {x: 1.02e-43, y: 1.26e-43, z: 6.667e-42, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -1335,7 +1335,7 @@ Transform:
   m_GameObject: {fileID: 1238497393}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.378, y: 1, z: -3.45}
+  m_LocalPosition: {x: 3.45, y: 1, z: -3.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
