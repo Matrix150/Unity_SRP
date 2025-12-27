@@ -48,7 +48,7 @@ public partial class CameraRender
         // Opaque
         var sortSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortSettings) { enableDynamicBatching = useDynamicBatching, enableInstancing = useGPUInstancing, 
-                                                                                    perObjectData = PerObjectData.Lightmaps | PerObjectData.ShadowMask| PerObjectData.LightProbe | PerObjectData.OcclusionProbe| PerObjectData.LightProbeProxyVolume | PerObjectData.OcclusionProbeProxyVolume };
+                                                                                    perObjectData = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.ShadowMask| PerObjectData.LightProbe | PerObjectData.OcclusionProbe| PerObjectData.LightProbeProxyVolume | PerObjectData.OcclusionProbeProxyVolume };
         drawingSettings.SetShaderPassName(1, litShaderTagId);
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
