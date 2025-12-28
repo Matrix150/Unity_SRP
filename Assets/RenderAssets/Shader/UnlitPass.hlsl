@@ -28,10 +28,11 @@ Varyings UnlitPassVertex(Attributes input)
 
 float4 UnlitPassFragment (Varyings input) : SV_TARGET
 {
+    InputConfig config = GetInputConfig(input.baseUV);
 	UNITY_SETUP_INSTANCE_ID(input);
-    float4 base = GetBase(input.baseUV);
+    float4 base = GetBase(config);
 	#if defined(_CLIPPING)
-	clip(base.a - GetCutoff(input.baseUV));	// Alpha clipping if CLIPPING is on
+	clip(base.a - GetCutoff(config));	// Alpha clipping if CLIPPING is on
 	#endif
 	return base;
 }
