@@ -12,7 +12,7 @@ public partial class CameraRender
                        litShaderTagId = new ShaderTagId("CustomLit");
     Lighting lighting = new Lighting();
 
-    public void Render(ScriptableRenderContext context, Camera camera, bool useDynamicBatching, bool useGPUInstancing, ShadowSettings shadowSettings)
+    public void Render(ScriptableRenderContext context, Camera camera, bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, ShadowSettings shadowSettings)
     {
         this.context = context;
         this.camera = camera;
@@ -24,10 +24,10 @@ public partial class CameraRender
 
         buffer.BeginSample(SampleName);
         ExecuteBuffer();
-        lighting.Setup(context, cullingResults, shadowSettings);
+        lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject);
         buffer.EndSample(SampleName);
         Setup();
-        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing);  // Pass batch setting
+        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject);  // Pass batch setting
         DrawGizmos();
         DrawUnsupportedShaders();
         lighting.Cleanup();
@@ -43,12 +43,14 @@ public partial class CameraRender
         ExecuteBuffer();
     }
 
-    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing)
+    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject)
     {
+        PerObjectData lightsPerObjectFlags = useLightsPerObject ? (PerObjectData.LightData | PerObjectData.LightIndices) : PerObjectData.None;
+
         // Opaque
         var sortSettings = new SortingSettings(camera) { criteria = SortingCriteria.CommonOpaque };
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortSettings) { enableDynamicBatching = useDynamicBatching, enableInstancing = useGPUInstancing, 
-                                                                                    perObjectData = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.ShadowMask| PerObjectData.LightProbe | PerObjectData.OcclusionProbe| PerObjectData.LightProbeProxyVolume | PerObjectData.OcclusionProbeProxyVolume };
+                                                                                    perObjectData = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.ShadowMask| PerObjectData.LightProbe | PerObjectData.OcclusionProbe| PerObjectData.LightProbeProxyVolume | PerObjectData.OcclusionProbeProxyVolume | lightsPerObjectFlags };
         drawingSettings.SetShaderPassName(1, litShaderTagId);
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
