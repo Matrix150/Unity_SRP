@@ -13,8 +13,9 @@ public partial class CameraRender
     Lighting lighting = new Lighting();
     PostFXStack postFXStack = new PostFXStack();
     static int frameBufferId = Shader.PropertyToID("_CameraFrameBuffer");
+    bool useHDR;
 
-    public void Render(ScriptableRenderContext context, Camera camera, bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings)
+    public void Render(ScriptableRenderContext context, Camera camera, bool allowHDR, bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings)
     {
         this.context = context;
         this.camera = camera;
@@ -24,10 +25,11 @@ public partial class CameraRender
         if (!Cull(shadowSettings.maxDistance))
             return;
 
+        useHDR = allowHDR && camera.allowHDR;
         buffer.BeginSample(SampleName);
         ExecuteBuffer();
         lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject);
-        postFXStack.Setup(context, camera, postFXSettings);
+        postFXStack.Setup(context, camera, postFXSettings, useHDR);
         buffer.EndSample(SampleName);
         Setup();
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject);  // Pass batch setting
@@ -53,7 +55,7 @@ public partial class CameraRender
             { 
                 flags = CameraClearFlags.Color;
             }
-            buffer.GetTemporaryRT(frameBufferId, camera.pixelWidth, camera.pixelHeight, 32, FilterMode.Bilinear, RenderTextureFormat.Default);
+            buffer.GetTemporaryRT(frameBufferId, camera.pixelWidth, camera.pixelHeight, 32, FilterMode.Bilinear, (useHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default));
             buffer.SetRenderTarget(frameBufferId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
         }
         buffer.ClearRenderTarget(flags <= CameraClearFlags.Depth, flags <= CameraClearFlags.Color, (flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear));

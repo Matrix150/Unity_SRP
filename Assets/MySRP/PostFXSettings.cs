@@ -15,10 +15,22 @@ public class PostFXSettings : ScriptableObject
         [Min(0f)] public float threshold;
         [Range(0f, 1f)] public float thresholdKnee;
         [Min(0f)] public float intensity;
+        public bool fadeFireflies;
+        public enum Mode { Additive, Scattering }
+        public Mode mode;
+        [Range(0.05f, 0.95f)] public float scatter;
     }
-    [SerializeField] BloomSettings bloom = default;
+    [SerializeField] BloomSettings bloom = new BloomSettings { scatter = 0.7f };
+
+    [System.Serializable] public struct ToneMappingSettings
+    {
+        public enum Mode { None = -1, Reinhard, Neutral, ACES }
+        public Mode mode;
+    }
+    [SerializeField] ToneMappingSettings toneMapping = default;  
     
     public BloomSettings Bloom => bloom;
+    public ToneMappingSettings ToneMapping => toneMapping;
 
     public Material Material 
     {

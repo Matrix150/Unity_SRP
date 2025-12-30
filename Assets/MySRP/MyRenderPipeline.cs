@@ -8,10 +8,12 @@ public partial class MyRenderPipeline : RenderPipeline
     bool useDynamicBatching, useGPUInstancing, useLightsPerObject;
     ShadowSettings shadowSettings;
     PostFXSettings postFXSettings;
+    bool allowHDR;
 
     // Constructor
-    public MyRenderPipeline(bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings)
+    public MyRenderPipeline(bool allowHDR, bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings)
     {
+        this.allowHDR = allowHDR;
         this.useDynamicBatching = useDynamicBatching;
         this.useGPUInstancing = useGPUInstancing;
         GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
@@ -34,7 +36,7 @@ public partial class MyRenderPipeline : RenderPipeline
         // Call CameraRenderer
         for (int i = 0; i < cameras.Count; i++)
         {
-            renderer.Render(context, cameras[i], useDynamicBatching, useGPUInstancing, useLightsPerObject, shadowSettings, postFXSettings);
+            renderer.Render(context, cameras[i], allowHDR, useDynamicBatching, useGPUInstancing, useLightsPerObject, shadowSettings, postFXSettings);
         }
     }
 }

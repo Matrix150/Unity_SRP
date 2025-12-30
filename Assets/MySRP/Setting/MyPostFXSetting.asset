@@ -15,8 +15,11 @@ MonoBehaviour:
   shader: {fileID: 4800000, guid: 9bf1d291dd0eeb8488d645a61f3751c2, type: 3}
   bloom:
     maxIterations: 16
-    downscaleLimit: 2
+    downscaleLimit: 20
     bicubicUpsampling: 1
-    threshold: 0.5
-    thresholdKnee: 0.5
-    intensity: 0
+    threshold: 1
+    thresholdKnee: 0
+    intensity: 1
+    fadeFireflies: 1
+    mode: 1
+    scatter: 0.7
