@@ -14,6 +14,7 @@ Shader "Hidden/My SRP/Post FX Stack"
 		#include "PostFXStackPass.hlsl"
 		ENDHLSL
 
+        // Blooming Pass
         Pass
         {
             Name "Copy"
@@ -94,34 +95,56 @@ Shader "Hidden/My SRP/Post FX Stack"
 			#pragma fragment BloomScatterFinalPassFragment
 			ENDHLSL
         }
+        // ------------------------------
 
+        // Tone Mapping Pass
         Pass
         {
-            Name "Tone Mapping Reinhard"
+            Name "Color Grading None"
             HLSLPROGRAM
 			#pragma target 3.5
 			#pragma vertex DefaultPassVertex
-			#pragma fragment ToneMappingReinhardPassFragment
+			#pragma fragment ColorGradingNonePassFragment
 			ENDHLSL
         }
 
         Pass
         {
-            Name "Tone Mapping Neutral"
+            Name "Color Grading Reinhard"
             HLSLPROGRAM
 			#pragma target 3.5
 			#pragma vertex DefaultPassVertex
-			#pragma fragment ToneMappingNeutralPassFragment 
+			#pragma fragment ColorGradingReinhardPassFragment
 			ENDHLSL
         }
 
         Pass
         {
-            Name "Tone Mapping ACES"
+            Name "Color Grading Neutral"
             HLSLPROGRAM
 			#pragma target 3.5
 			#pragma vertex DefaultPassVertex
-			#pragma fragment ToneMappingACESPassFragment  
+			#pragma fragment ColorGradingNeutralPassFragment 
+			ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Color Grading ACES"
+            HLSLPROGRAM
+			#pragma target 3.5
+			#pragma vertex DefaultPassVertex
+			#pragma fragment ColorGradingACESPassFragment  
+			ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Final"
+            HLSLPROGRAM
+			#pragma target 3.5
+			#pragma vertex DefaultPassVertex
+			#pragma fragment FinalPassFragment  
 			ENDHLSL
         }
     }
