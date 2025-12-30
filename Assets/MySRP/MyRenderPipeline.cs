@@ -6,16 +6,18 @@ public partial class MyRenderPipeline : RenderPipeline
 {
     CameraRender renderer = new CameraRender();
     bool useDynamicBatching, useGPUInstancing, useLightsPerObject;
-    ShadowSettings shadowSetting;
+    ShadowSettings shadowSettings;
+    PostFXSettings postFXSettings;
 
     // Constructor
-    public MyRenderPipeline(bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher, bool useLightsPerObject, ShadowSettings shadowSetting)
+    public MyRenderPipeline(bool useDynamicBatching, bool useGPUInstancing, bool useSRPBatcher, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings)
     {
-        this.shadowSetting = shadowSetting;
         this.useDynamicBatching = useDynamicBatching;
         this.useGPUInstancing = useGPUInstancing;
-        this.useLightsPerObject = useLightsPerObject;
         GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+        this.useLightsPerObject = useLightsPerObject;
+        this.shadowSettings = shadowSettings;
+        this.postFXSettings = postFXSettings;
         GraphicsSettings.lightsUseLinearIntensity = true;
 
         InitializeForEditor();
@@ -32,7 +34,7 @@ public partial class MyRenderPipeline : RenderPipeline
         // Call CameraRenderer
         for (int i = 0; i < cameras.Count; i++)
         {
-            renderer.Render(context, cameras[i], useDynamicBatching, useGPUInstancing, useLightsPerObject, shadowSetting);
+            renderer.Render(context, cameras[i], useDynamicBatching, useGPUInstancing, useLightsPerObject, shadowSettings, postFXSettings);
         }
     }
 }

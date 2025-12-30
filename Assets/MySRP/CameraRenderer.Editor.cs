@@ -6,7 +6,9 @@ using UnityEngine.Rendering;
 
 public partial class CameraRender
 {
-    partial void DrawGizmos();
+    //partial void DrawGizmos();
+    partial void DrawGizmosBeforeFX();
+    partial void DrawGizmosAfterFX();
     partial void DrawUnsupportedShaders();
     partial void PrepareForSceneWindow();
     partial void PrepareBuffer();
@@ -24,13 +26,25 @@ public partial class CameraRender
     // Error Material
     static Material errorMaterial;
 
-    partial void DrawGizmos()
+    /*partial void DrawGizmos()
     {
         if (Handles.ShouldRenderGizmos())
         {
             context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
             context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
         }
+    }*/
+
+    partial void DrawGizmosBeforeFX()
+    {
+        if(Handles.ShouldRenderGizmos())
+            context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
+    }
+
+    partial void DrawGizmosAfterFX()
+    {
+        if (Handles.ShouldRenderGizmos())
+            context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
     }
 
     partial void DrawUnsupportedShaders()

@@ -197,6 +197,7 @@ float FilterOtherShadow(float3 positionSTS, float3 bounds)
 #endif
 }
 
+// Point Light = 6 sides of Spot Light
 static const float3 pointShadowPlanes[6] =
 {
     float3(-1.0, 0.0, 0.0),

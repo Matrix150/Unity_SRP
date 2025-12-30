@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,10 +6,11 @@ using UnityEngine.Rendering;
 public class MyRenderPipelineAsset : RenderPipelineAsset
 {
     [SerializeField] bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true, useLightsPerObject = true; // Batch settings
-    [SerializeField] ShadowSettings shadow = default;
+    [SerializeField] ShadowSettings shadows = default;
+    [SerializeField] PostFXSettings postFXSettings = default;
 
     protected override RenderPipeline CreatePipeline()
     {
-        return new MyRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, useLightsPerObject, shadow);
+        return new MyRenderPipeline(useDynamicBatching, useGPUInstancing, useSRPBatcher, useLightsPerObject, shadows, postFXSettings);
     }
 }
