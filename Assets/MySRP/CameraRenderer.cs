@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public partial class CameraRender
+public partial class CameraRenderer
 {
     ScriptableRenderContext context;
     Camera camera;
@@ -14,11 +14,16 @@ public partial class CameraRender
     PostFXStack postFXStack = new PostFXStack();
     static int frameBufferId = Shader.PropertyToID("_CameraFrameBuffer");
     bool useHDR;
+    static CameraSettings defaultCameraSettings = new CameraSettings();
 
     public void Render(ScriptableRenderContext context, Camera camera, bool allowHDR, bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings, int colorLUTResolution)
     {
         this.context = context;
         this.camera = camera;
+        var crpCamera = camera.GetComponent<MyRenderPipelineCamera>();
+        CameraSettings cameraSettings = crpCamera ? crpCamera.Settings : defaultCameraSettings;
+        if (cameraSettings.overridePostFX)
+            postFXSettings = cameraSettings.postFXSettings;
 
         PrepareBuffer();
         PrepareForSceneWindow();
@@ -28,11 +33,11 @@ public partial class CameraRender
         useHDR = allowHDR && camera.allowHDR;
         buffer.BeginSample(SampleName);
         ExecuteBuffer();
-        lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject);
-        postFXStack.Setup(context, camera, postFXSettings, useHDR, colorLUTResolution);
+        lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject, (cameraSettings.maskLights ? cameraSettings.renderingLayerMask : -1));
+        postFXStack.Setup(context, camera, postFXSettings, useHDR, colorLUTResolution, cameraSettings.finalBlendMode);
         buffer.EndSample(SampleName);
         Setup();
-        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject);  // Pass batch setting
+        DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject, cameraSettings.renderingLayerMask);  // Pass batch setting
         //DrawGizmos();
         DrawGizmosBeforeFX();
         DrawUnsupportedShaders();
@@ -72,7 +77,7 @@ public partial class CameraRender
         }
     }
 
-    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject)
+    void DrawVisibleGeometry(bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, int renderingLayerMask)
     {
         PerObjectData lightsPerObjectFlags = useLightsPerObject ? (PerObjectData.LightData | PerObjectData.LightIndices) : PerObjectData.None;
 
@@ -81,7 +86,7 @@ public partial class CameraRender
         var drawingSettings = new DrawingSettings(unlitShaderTagId, sortSettings) { enableDynamicBatching = useDynamicBatching, enableInstancing = useGPUInstancing, 
                                                                                     perObjectData = PerObjectData.ReflectionProbes | PerObjectData.Lightmaps | PerObjectData.ShadowMask| PerObjectData.LightProbe | PerObjectData.OcclusionProbe| PerObjectData.LightProbeProxyVolume | PerObjectData.OcclusionProbeProxyVolume | lightsPerObjectFlags };
         drawingSettings.SetShaderPassName(1, litShaderTagId);
-        var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
+        var filteringSettings = new FilteringSettings(RenderQueueRange.opaque, renderingLayerMask: (uint)renderingLayerMask);
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
 
         // Skybox

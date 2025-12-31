@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 
 [CreateAssetMenu(menuName = "Rendering/MyRenderPipeline")]
 
-public class MyRenderPipelineAsset : RenderPipelineAsset
+public partial class MyRenderPipelineAsset : RenderPipelineAsset
 {
     [SerializeField] bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true, useLightsPerObject = true; // Batch settings
     [SerializeField] ShadowSettings shadows = default;

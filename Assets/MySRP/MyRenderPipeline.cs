@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 
 public partial class MyRenderPipeline : RenderPipeline
 {
-    CameraRender renderer = new CameraRender();
+    CameraRenderer renderer = new CameraRenderer();
     bool useDynamicBatching, useGPUInstancing, useLightsPerObject;
     ShadowSettings shadowSettings;
     PostFXSettings postFXSettings;

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 
-public partial class CameraRender
+public partial class CameraRenderer
 {
     //partial void DrawGizmos();
     partial void DrawGizmosBeforeFX();

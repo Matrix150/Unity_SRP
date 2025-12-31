@@ -9,6 +9,7 @@ CBUFFER_START(UnityPerDraw)
 	real4 unity_WorldTransformParams;
 	real4 unity_LightData;
 	real4 unity_LightIndices[2];
+	float4 unity_RenderingLayer;
 
 	// For light maps
 	float4 unity_LightmapST;
