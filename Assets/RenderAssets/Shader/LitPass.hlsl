@@ -56,9 +56,8 @@ Varyings LitPassVertex(Attributes input)
 float4 LitPassFragment (Varyings input) : SV_TARGET
 {
 	UNITY_SETUP_INSTANCE_ID(input);
-    ClipLOD(input.positionCS.xy, unity_LODFade.x);
-	
-    InputConfig config = GetInputConfig(input.baseUV);
+    InputConfig config = GetInputConfig(input.positionCS, input.baseUV);	//Screen Space
+    ClipLOD(config.fragment, unity_LODFade.x);
 #if defined(_MASK_MAP)
 	config.useMask = true;
 #endif
@@ -89,7 +88,7 @@ float4 LitPassFragment (Varyings input) : SV_TARGET
     surface.occlusion = GetOcclusion(config);
     surface.smoothness = GetSmoothness(config);
     surface.fresnelStrength = GetFresnel(config);
-    surface.dither = InterleavedGradientNoise(input.positionCS.xy, 0);
+    surface.dither = InterleavedGradientNoise(config.fragment.positionSS, 0);
     surface.renderingLayerMask = asuint(unity_RenderingLayer.x);
 
 	// Opaque or Transparent

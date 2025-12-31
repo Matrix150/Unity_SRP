@@ -37,14 +37,28 @@ public partial class CameraRenderer
 
     partial void DrawGizmosBeforeFX()
     {
-        if(Handles.ShouldRenderGizmos())
+        if (Handles.ShouldRenderGizmos())
+        {
+            if (useIntermediateBuffer)
+            {
+                Draw(depthAttachmentId, BuiltinRenderTextureType.CameraTarget, true);
+                ExecuteBuffer();
+            }
             context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
+        }
     }
 
     partial void DrawGizmosAfterFX()
     {
         if (Handles.ShouldRenderGizmos())
+        {
+            if (postFXStack.isActive)
+            {
+                Draw(depthAttachmentId, BuiltinRenderTextureType.CameraTarget, true);
+                ExecuteBuffer();
+            }
             context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
+        }
     }
 
     partial void DrawUnsupportedShaders()

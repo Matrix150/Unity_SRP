@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
         public BlendMode source, destination;
     }
 
+    public bool copyColor = true, copyDepth = true;
     [RenderingLayerMaskField] public int renderingLayerMask = -1;
     public bool maskLights = false;
     public bool overridePostFX = false;

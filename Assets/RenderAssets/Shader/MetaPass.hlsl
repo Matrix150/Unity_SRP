@@ -36,7 +36,7 @@ Varyings MetaPassVertex(Attributes input)
 
 float4 MetaPassFragment(Varyings input) : SV_TARGET
 {
-    InputConfig config = GetInputConfig(input.baseUV);
+    InputConfig config = GetInputConfig(input.positionCS, input.baseUV);    //Screen Space
     float4 base = GetBase(config);
     Surface surface;
     ZERO_INITIALIZE(Surface, surface);
