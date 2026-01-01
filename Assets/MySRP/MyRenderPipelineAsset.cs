@@ -13,12 +13,7 @@ public partial class MyRenderPipelineAsset : RenderPipelineAsset
     [SerializeField] ColorLUTResolution colorLUTResolution = ColorLUTResolution._32;
     [SerializeField] Shader cameraRendererShader = default;
 
-    [System.Serializable] public struct CameraBufferSettings
-    {
-        public bool allowHDR;
-        public bool copyColor, copyColorReflection, copyDepth, copyDepthReflection;
-    }
-    [SerializeField] CameraBufferSettings cameraBuffer = new CameraBufferSettings { allowHDR = true };
+    [SerializeField] CameraBufferSettings cameraBuffer = new CameraBufferSettings { allowHDR = true, renderScale = 1f };
 
     protected override RenderPipeline CreatePipeline()
     {

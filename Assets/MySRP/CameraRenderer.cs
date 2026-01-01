@@ -13,20 +13,23 @@ public partial class CameraRenderer
                        litShaderTagId = new ShaderTagId("CustomLit");
     Lighting lighting = new Lighting();
     PostFXStack postFXStack = new PostFXStack();
-    static int colorAttachmentId = Shader.PropertyToID("_CameraColorAttachment"),
+    static int bufferSizeId = Shader.PropertyToID("_CameraBufferSize"),
+               colorAttachmentId = Shader.PropertyToID("_CameraColorAttachment"),
                depthAttachmentId = Shader.PropertyToID("_CameraDepthAttachment"),
                colorTextureId = Shader.PropertyToID("_CameraColorTexture"),
                depthTextureId = Shader.PropertyToID("_CameraDepthTexture"),
                sourceTextureId = Shader.PropertyToID("_SourceTexture"),
                srcBlendId = Shader.PropertyToID("_CameraSrcBlend"),
                dstBlendId = Shader.PropertyToID("_CameraDstBlend");
-    bool useHDR;
+    bool useHDR, useScaledRendering;
     static CameraSettings defaultCameraSettings = new CameraSettings();
     bool useColorTexture, useDepthTexture, useIntermediateBuffer;
     Material material;
     Texture2D missingTexture;
     static bool copyTextureSupported = SystemInfo.copyTextureSupport > CopyTextureSupport.None;
     static Rect fullViewRect = new Rect(0f, 0f, 1f, 1f);
+    Vector2Int bufferSize;
+    public const float renderScaleMin = 0.1f, renderScaleMax = 2f;
 
     public void Render(ScriptableRenderContext context, Camera camera, CameraBufferSettings bufferSettings, bool useDynamicBatching, bool useGPUInstancing, bool useLightsPerObject, ShadowSettings shadowSettings, PostFXSettings postFXSettings, int colorLUTResolution)
     {
@@ -48,16 +51,31 @@ public partial class CameraRenderer
         if (cameraSettings.overridePostFX)
             postFXSettings = cameraSettings.postFXSettings;
 
+        float renderScale = cameraSettings.GetRenderScale(bufferSettings.renderScale);
+        useScaledRendering = renderScale < 0.99f || renderScale > 1.01f;        // Give it a variance
         PrepareBuffer();
         PrepareForSceneWindow();
         if (!Cull(shadowSettings.maxDistance))
             return;
 
         useHDR = bufferSettings.allowHDR && camera.allowHDR;
+        if (useScaledRendering)
+        {
+            renderScale = Mathf.Clamp(renderScale, renderScaleMin, renderScaleMax);
+            bufferSize.x = (int)(camera.pixelWidth * renderScale);
+            bufferSize.y = (int)(camera.pixelHeight * renderScale);
+        }
+        else
+        { 
+            bufferSize.x = camera.pixelWidth;
+            bufferSize.y = camera.pixelHeight;
+        }
+
         buffer.BeginSample(SampleName);
+        buffer.SetGlobalVector(bufferSizeId, new Vector4(1f / bufferSize.x, 1f / bufferSize.y, bufferSize.x, bufferSize.y));
         ExecuteBuffer();
         lighting.Setup(context, cullingResults, shadowSettings, useLightsPerObject, (cameraSettings.maskLights ? cameraSettings.renderingLayerMask : -1));
-        postFXStack.Setup(context, camera, postFXSettings, useHDR, colorLUTResolution, cameraSettings.finalBlendMode);
+        postFXStack.Setup(context, camera, bufferSize, postFXSettings, useHDR, colorLUTResolution, cameraSettings.finalBlendMode, bufferSettings.bicubicRescaling);
         buffer.EndSample(SampleName);
         Setup();
         DrawVisibleGeometry(useDynamicBatching, useGPUInstancing, useLightsPerObject, cameraSettings.renderingLayerMask);  // Pass batch setting
@@ -82,15 +100,15 @@ public partial class CameraRenderer
     {
         context.SetupCameraProperties(camera);
         CameraClearFlags flags = camera.clearFlags;
-        useIntermediateBuffer = useColorTexture || useDepthTexture || postFXStack.isActive;
+        useIntermediateBuffer = useScaledRendering || useColorTexture || useDepthTexture || postFXStack.isActive;
         if (useIntermediateBuffer)
         {
             if (flags > CameraClearFlags.Color)
             { 
                 flags = CameraClearFlags.Color;
             }
-            buffer.GetTemporaryRT(colorAttachmentId, camera.pixelWidth, camera.pixelHeight, 0, FilterMode.Bilinear, (useHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default));
-            buffer.GetTemporaryRT(depthAttachmentId, camera.pixelWidth, camera.pixelHeight, 32, FilterMode.Point, RenderTextureFormat.Depth);
+            buffer.GetTemporaryRT(colorAttachmentId, bufferSize.x, bufferSize.y, 0, FilterMode.Bilinear, (useHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default));
+            buffer.GetTemporaryRT(depthAttachmentId, bufferSize.x, bufferSize.y, 32, FilterMode.Point, RenderTextureFormat.Depth);
             buffer.SetRenderTarget(colorAttachmentId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store, depthAttachmentId, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
         }
         buffer.ClearRenderTarget(flags <= CameraClearFlags.Depth, flags <= CameraClearFlags.Color, (flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear));
@@ -174,7 +192,7 @@ public partial class CameraRenderer
     {
         if (useColorTexture)
         { 
-            buffer.GetTemporaryRT(colorTextureId, camera.pixelWidth, camera.pixelHeight, 0, FilterMode.Bilinear, (useHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default));
+            buffer.GetTemporaryRT(colorTextureId, bufferSize.x, bufferSize.y, 0, FilterMode.Bilinear, (useHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default));
             if (copyTextureSupported)
             {
                 buffer.CopyTexture(colorAttachmentId, colorTextureId);
@@ -186,7 +204,7 @@ public partial class CameraRenderer
         }
         if (useDepthTexture)
         {
-            buffer.GetTemporaryRT(depthTextureId, camera.pixelWidth, camera.pixelHeight, 32, FilterMode.Point, RenderTextureFormat.Depth);
+            buffer.GetTemporaryRT(depthTextureId, bufferSize.x, bufferSize.y, 32, FilterMode.Point, RenderTextureFormat.Depth);
             if (copyTextureSupported)
             {
                 buffer.CopyTexture(depthAttachmentId, depthTextureId);
