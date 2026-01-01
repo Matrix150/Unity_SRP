@@ -291,10 +291,18 @@ float4 ColorGradingACESPassFragment(Varyings input) : SV_TARGET
     return float4(color, 1.0);
 }
 
-float4 FinalPassFragment(Varyings input) : SV_TARGET
+float4 ApplyColorGradingPassFragment(Varyings input) : SV_TARGET
 {
     float4 color = GetSource(input.screenUV);
     color.rgb = ApplyColorGradingLUT(color.rgb);
+    return color;
+}
+
+float4 ApplyColorGradingWithLumaPassFragment(Varyings input) : SV_TARGET
+{
+    float4 color = GetSource(input.screenUV);
+    color.rgb = ApplyColorGradingLUT(color.rgb);
+    color.a = sqrt(Luminance(color.rgb));
     return color;
 }
 // ------------------------------

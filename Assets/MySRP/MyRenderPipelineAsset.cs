@@ -13,7 +13,7 @@ public partial class MyRenderPipelineAsset : RenderPipelineAsset
     [SerializeField] ColorLUTResolution colorLUTResolution = ColorLUTResolution._32;
     [SerializeField] Shader cameraRendererShader = default;
 
-    [SerializeField] CameraBufferSettings cameraBuffer = new CameraBufferSettings { allowHDR = true, renderScale = 1f };
+    [SerializeField] CameraBufferSettings cameraBuffer = new CameraBufferSettings { allowHDR = true, renderScale = 1f, fXAA = new CameraBufferSettings.FXAA { fixedThreshold = 0.0833f, relativeThreshold = 0.166f, subpixelBlending = 0.75f } };
 
     protected override RenderPipeline CreatePipeline()
     {
