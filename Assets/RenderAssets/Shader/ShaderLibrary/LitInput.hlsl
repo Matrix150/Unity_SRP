@@ -138,7 +138,7 @@ float GetOcclusion(InputConfig c)   // G channel in Maskmap
 float GetSmoothness(InputConfig c)  // A channel in Maskmap
 {
     float smoothness = INPUT_PROP(_Smoothness);
-    smoothness *= GetMask(c).a;
+    smoothness *= 1.0 - GetMask(c).b;
     
     if (c.useDetail)
     {
